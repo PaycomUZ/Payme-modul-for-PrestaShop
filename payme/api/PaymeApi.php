@@ -434,7 +434,7 @@ class PaymeApi {
 
 		$responseArray['result'] = array( "transactions"=> $transactions );		
 
-		return $responseArray);
+		return $responseArray;
 	}
 
 	public function GenerateResponse() {

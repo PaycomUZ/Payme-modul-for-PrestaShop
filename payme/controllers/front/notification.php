@@ -11,6 +11,5 @@ class PaymeNotificationModuleFrontController extends ModuleFrontController {
 		$api->setInputArray(file_get_contents("php://input"));
 
 		exit(Tools::jsonEncode($api->parseRequest()));
-
 	}
 }

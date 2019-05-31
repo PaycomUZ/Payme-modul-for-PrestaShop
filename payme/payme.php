@@ -13,15 +13,12 @@ class Payme extends PaymentModule {
 	public $payme_merchant_id;
 	public $payme_secret_key;
 	public $payme_secret_key_test;
-
 	public $payme_test_mode;
 	public $payme_checkout_url;
 	public $payme_checkout_url_test;
-
 	public $payme_return_url;
 	public $payme_return_after;
 	public $payme_add_product_information;
-
 	public $payme_endpoint_url;
 
 	public function __construct() {
@@ -30,7 +27,7 @@ class Payme extends PaymentModule {
 		$this->tab = 'payments_gateways';
 		$this->version = '1.0.0.1';
 		$this->author = 'Paycom';
-		//$this->controllers = array('payment', 'validation','redirect');
+
 		$this->ps_versions_compliancy = [
 			'min' => '1.7',
 			'max' => _PS_VERSION_
@@ -40,8 +37,8 @@ class Payme extends PaymentModule {
 
 		parent::__construct();
 
-		$this->displayName	  = 'Payme';
-		$this->description	  = $this->l('DESCRIPTION');
+		$this->displayName	    = 'Payme';
+		$this->description	    = $this->l('DESCRIPTION');
 		$this->confirmUninstall = $this->l('DELETE_CONFIRM');
 	}
 
@@ -53,15 +50,12 @@ class Payme extends PaymentModule {
 		Configuration::updateValue('PAYME_MERCHANT_ID','');
 		Configuration::updateValue('PAYME_SECRET_KEY', '');
 		Configuration::updateValue('PAYME_SECRET_KEY_TEST', '');
-
 		Configuration::updateValue('PAYME_TEST_MODE', '');
 		Configuration::updateValue('PAYME_CHECKOUT_URL', '');
 		Configuration::updateValue('PAYME_CHECKOUT_URL_TEST', '');
-
 		Configuration::updateValue('PAYME_RETURN_URL', '');
 		Configuration::updateValue('PAYME_RETURN_AFTER', '');
 		Configuration::updateValue('PAYME_ADD_PRODUCT_INFORMATION', '');
-
 		Configuration::updateValue('PAYME_ENDPOINT_URL', '');
 
 		Db::getInstance()->execute(
@@ -98,17 +92,13 @@ class Payme extends PaymentModule {
 			!Configuration::deleteByName('PAYME_MERCHANT_ID')||
 			!Configuration::deleteByName('PAYME_SECRET_KEY')||
 			!Configuration::deleteByName('PAYME_SECRET_KEY_TEST')||
-
 			!Configuration::deleteByName('PAYME_TEST_MODE')||
 			!Configuration::deleteByName('PAYME_CHECKOUT_URL')||
 			!Configuration::deleteByName('PAYME_CHECKOUT_URL_TEST')||
-
 			!Configuration::deleteByName('PAYME_RETURN_URL')||
 			!Configuration::deleteByName('PAYME_RETURN_AFTER')||
-			!Configuration::deleteByName('PAYME_ADD_PRODUCT_INFORMATION')||
-			
+			!Configuration::deleteByName('PAYME_ADD_PRODUCT_INFORMATION')||			
 			!Configuration::deleteByName('PAYME_ENDPOINT_URL')||
-
 			!parent::uninstall() )
 		return false;	
 
@@ -123,8 +113,8 @@ class Payme extends PaymentModule {
 
 		$newOption = new PaymentOption();
 		$newOption->setCallToActionText($this->l('PAY_WITH_PAYME'))
-			->setAction($this->context->link->getModuleLink($this->name, 'validation', array(), true))
-			->setAdditionalInformation($this->context->smarty->fetch('module:payme/views/templates/front/payment_request.tpl'));
+				  ->setAction($this->context->link->getModuleLink($this->name, 'validation', array(), true))
+				  ->setAdditionalInformation($this->context->smarty->fetch('module:payme/views/templates/front/payment_request.tpl'));
 
 		return array($newOption);
 	}
@@ -146,7 +136,7 @@ class Payme extends PaymentModule {
 			if (!sizeof($this->formErrors)) {
 
 				$this->saveConfig();
-				$this->_html .= $this->displayConfirmation($this->l('Settings updated'));
+				$this->_html .= $this->displayConfirmation($this->l('SUCCESSFUL'));
 
 			} else {
 

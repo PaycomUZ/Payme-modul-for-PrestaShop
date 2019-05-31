@@ -45,5 +45,4 @@ class PaymeValidationModuleFrontController extends ModuleFrontController {
 
 		Tools::redirect($paymeUrl);
 	}
-
 }

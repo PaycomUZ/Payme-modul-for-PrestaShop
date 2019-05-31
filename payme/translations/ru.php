@@ -2,7 +2,7 @@
 
 global $_MODULE;
 $_MODULE = array();
-
+$_MODULE['<{payme}prestashop>payme_dd1dab546c7769f17e9d4e8e4f2f1bf4'] = 'Удачно !'; //SUCCESSFUL
 $_MODULE['<{payme}prestashop>payme_baff0b0835945394af022fcf4ce62832'] = 'Удалит ?'; //DELETE_CONFIRM
 $_MODULE['<{payme}prestashop>payme_35ba4a2677442e210c23a00a5601aba3'] = 'Payme Business даёт возможность принимать платежи на вашем веб-сайте или через приложение, по e-mail или SMS, или же в самой торговой точке по системе бесконтактных платежей и QR-коду.'; //DESCRIPTION
 $_MODULE['<{payme}prestashop>payme_6d26c556b1bdc79cf7d21c4329ebd716'] = 'Этот модуль позволяет производить оплату через Payme.'; //MODUL_DESCRIPTION

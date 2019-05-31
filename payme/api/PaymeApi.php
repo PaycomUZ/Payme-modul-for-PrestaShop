@@ -9,6 +9,7 @@ class PaymeApi {
 	private $result =true;
 	private $inputArray;
 	private $lastTransaction;
+	private $statement;
 
 	public function construct() {}
 
@@ -37,7 +38,7 @@ class PaymeApi {
 				// Request ID
 				if (!empty($this->inputArray['id']) ) {
 
-					$this->request_id = $this->inputArray['id'];
+					$this->request_id = filter_var($this->inputArray['id'], FILTER_SANITIZE_NUMBER_INT);
 				}
 
 					 if ($_SERVER['REQUEST_METHOD']!='POST') $this->setErrorCod(-32300);
@@ -82,7 +83,7 @@ class PaymeApi {
 
 	public function payme_CheckPerformTransaction() {
 
-		$order_id = $this->inputArray['params']['account']['order_id'];
+		$order_id = filter_var( $this->inputArray['params']['account']['order_id'], FILTER_SANITIZE_NUMBER_INT);
 
 		// Поиск заказа по order_id
 		$order = new Order($order_id);
@@ -127,13 +128,13 @@ class PaymeApi {
 
 	public function payme_CreateTransaction() {
 
-		$order_id = $this->inputArray['params']['account']['order_id'];
- 
 		// Поиск заказа по order_id
+		$order_id = filter_var( $this->inputArray['params']['account']['order_id'], FILTER_SANITIZE_NUMBER_INT);
 		$order = new Order($order_id);
 
 		// Поиск транзакции по id
-		$this->getLastTransaction($this->inputArray['params']['id']);
+		$transactionId=$this->inputArray['params']['id'];
+		$this->getLastTransaction($transactionId);
 
 		// Существует транзакция
 		if ($this->lastTransaction) {
@@ -163,7 +164,7 @@ class PaymeApi {
 				Db::getInstance()->update('payme_transactions', $updateData, 'transaction_id= '.(int)$this->lastTransaction['transaction_id'] );
 				$order->setCurrentState(_PS_OS_CANCELED_);
 
-				$this->getLastTransaction($this->inputArray['params']['id']);
+				$this->getLastTransaction($transactionId);
 				$this->responceType=2;
 
 			// Всё OK
@@ -227,12 +228,13 @@ class PaymeApi {
 	public function payme_CheckTransaction() {
 
 		// Поиск транзакции по id
-		$this->getLastTransaction($this->inputArray['params']['id']);
+		$transactionId=$this->inputArray['params']['id'];
+		$this->getLastTransaction($transactionId);
 
 		// Существует транзакция
 		if ($this->lastTransaction) {
 
-			$this->responceType=2; 
+			$this->responceType=2;
 
 		// Транзакция нет
 		} else {
@@ -244,7 +246,8 @@ class PaymeApi {
 	public function payme_PerformTransaction() {
 
 		// Поиск транзакции по id
-		$this->getLastTransaction($this->inputArray['params']['id']);
+		$transactionId=$this->inputArray['params']['id'];
+		$this->getLastTransaction($transactionId);
 
 		// Существует транзакция
 		if ( $this->lastTransaction ) {
@@ -283,7 +286,7 @@ class PaymeApi {
 				}
 
 				$this->responceType=2;
-				$this->getLastTransaction($this->inputArray['params']['id']);
+				$this->getLastTransaction($transactionId);
 
 			// Cостояние не 1
 			} else {
@@ -310,7 +313,8 @@ class PaymeApi {
 	public function payme_CancelTransaction() {
 
 		// Поиск транзакции по id
-		$this->getLastTransaction($this->inputArray['params']['id']);
+		$transactionId=$this->inputArray['params']['id'];
+		$this->getLastTransaction($transactionId);
 
 		// Существует транзакция
 		if ($this->lastTransaction) {
@@ -351,7 +355,7 @@ class PaymeApi {
 			}
 
 			$this->responceType=2;
-			$this->getLastTransaction($this->inputArray['params']['id']);
+			$this->getLastTransaction($transactionId);
 
 		// Транзакция нет
 		} else {
@@ -391,7 +395,7 @@ class PaymeApi {
 		$this->responceType=3;
 	}
 
-	public function payme_GetStatement() { 
+	public function payme_GetStatement() {
 
 		$query="SELECT 
 					t.paycom_time,
@@ -404,19 +408,19 @@ class PaymeApi {
 					t.state,
 					t.reason,
 					t.receivers
-				FROM  payme_transactions t 
+				FROM  "._DB_PREFIX_."payme_transactions t 
 				WHERE t.paycom_time_datetime>='".$this->timestamp2datetime($this->inputArray['params']['from'] )."' and 
 					  t.paycom_time_datetime<='".$this->timestamp2datetime($this->inputArray['params']['to'] )  ."'
 				ORDER BY t.paycom_time_datetime ";
 
 		$rows = Db::getInstance()->ExecuteS($query);
-		
+
 		$responseArray = array();
 		$transactions  = array();
 
 		foreach ($rows as $row) {
 
-			  array_push($transactions,array(
+			array_push($transactions,array(
 
 				"id"		   => $row["paycom_transaction_id"],
 				"time"		   => $row['paycom_time']  ,
@@ -432,9 +436,10 @@ class PaymeApi {
 			)) ;
 		}
 
-		$responseArray['result'] = array( "transactions"=> $transactions );		
+		$responseArray['result'] = array( "transactions"=> $transactions );
 
-		return $responseArray;
+		$this->responceType=4;
+		$this->statement=$responseArray;
 	}
 
 	public function GenerateResponse() {
@@ -461,7 +466,11 @@ class PaymeApi {
 
 			} else if ($this->responceType==3) {
 
-				$responseArray = array('result'=>array( 'success' => true )); 
+				$responseArray = array('result'=>array( 'success' => true ));
+
+			} else if ($this->responceType==4) {
+				
+				$responseArray=$this->statement;
 			}
 
 		} else {
